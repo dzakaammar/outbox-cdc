@@ -73,6 +73,8 @@ func handleCreateUser(dbConn *pgx.Conn) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
