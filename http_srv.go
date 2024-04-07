@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,7 +15,7 @@ import (
 
 var appTimeout = 10 * time.Second
 
-func runApp() {
+func runHTTPServer() {
 	dbConn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -51,7 +50,7 @@ func runApp() {
 	}()
 
 	<-stopCh
-	slog.Info("app stopped")
+	log.Println("app stopped")
 }
 
 type createUserRequest struct {
@@ -108,7 +107,7 @@ func storeUser(ctx context.Context, dbConn *pgx.Conn, req createUserRequest) err
 		return err
 	}
 
-	slog.Info("outbox has successfully created. id : " + strconv.Itoa(outboxID))
+	log.Println("outbox has successfully created with id : " + strconv.Itoa(outboxID))
 
 	return tx.Commit(ctx)
 }

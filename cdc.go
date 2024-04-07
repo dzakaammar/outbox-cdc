@@ -183,7 +183,7 @@ func processV2(nc *nats.Conn, walData []byte, relations map[uint32]*pglogrepl.Re
 			log.Println("failed to publish message", err)
 		}
 
-		log.Println("sucessfully publish message with ", values)
+		log.Println("sucessfully publish message: ", string(b))
 
 	case *pglogrepl.StreamStartMessageV2:
 		*inStream = true

@@ -8,8 +8,8 @@ import (
 func main() {
 	flag.Parse()
 	switch flag.Arg(0) {
-	case "app":
-		runApp()
+	case "http":
+		runHTTPServer()
 	case "cdc":
 		runCDC()
 	default:

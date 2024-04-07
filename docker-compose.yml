@@ -33,7 +33,7 @@ services:
     environment:
       - NATS_URL=nats://nats:4222
     command: ["nats", "sub", "-s", "nats://nats:4222", "user.created"]
-  app:
+  http_server:
     build: .
     ports:
       - "8080:8080"
@@ -43,7 +43,7 @@ services:
         restart: true 
     environment:
       - DATABASE_URL=postgres://root:secret@postgres:5432/outbox_cdc
-    command: ["app"]
+    command: ["http"]
   cdc:
     build: .
     depends_on:
