@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=outbox_cdc
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: |
+      postgres -c wal_level=logical -c max_replication_slots=5 -c max_wal_senders=5
+    restart: always
+    healthcheck:
+      test: 'pg_isready -U root --dbname=postgres'
+      interval: 1s
+      timeout: 2s
+      retries: 3
+  nats:
+    image: nats:alpine
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    restart: always
+  nats-box:
+    image: natsio/nats-box:latest
+    depends_on:
+      nats:
+        condition: service_started
+    environment:
+      - NATS_URL=nats://nats:4222
+    command: ["nats", "sub", "-s", "nats://nats:4222", "user.created"]
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true 
+    environment:
+      - DATABASE_URL=postgres://root:secret@postgres:5432/outbox_cdc
+    command: ["app"]
+  cdc:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true 
+      nats:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgres://root:secret@postgres:5432/outbox_cdc?replication=database
+      - NATS_URL=nats://nats:4222
+    command: ["cdc"]
+  
