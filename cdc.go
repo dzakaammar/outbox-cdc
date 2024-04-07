@@ -35,7 +35,7 @@ func runCDC() {
 	result := dbConn.Exec(context.Background(), "CREATE PUBLICATION pglogrepl_demo FOR TABLE outbox WITH (publish = 'insert');")
 	_, err = result.ReadAll()
 	if err != nil {
-		log.Fatalln("create publication error", err)
+		log.Println("create publication error", err)
 	}
 
 	sysident, err := pglogrepl.IdentifySystem(context.Background(), dbConn)
@@ -183,7 +183,7 @@ func processV2(nc *nats.Conn, walData []byte, relations map[uint32]*pglogrepl.Re
 			log.Println("failed to publish message", err)
 		}
 
-		log.Println("sucessfully publish message: ", string(b))
+		log.Println("sucessfully publish message:", string(b))
 
 	case *pglogrepl.StreamStartMessageV2:
 		*inStream = true
