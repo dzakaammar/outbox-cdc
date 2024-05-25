@@ -9,7 +9,7 @@ Change Data Capture (CDC) is a technique used in software systems to capture and
 
 ### Sequence Diagram
 
-![alt](./docs/arc.png)
+![](./docs/arc.svg)
 
 - Run the docker compose
     - `$ docker-compose up`
